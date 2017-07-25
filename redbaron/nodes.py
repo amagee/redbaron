@@ -695,6 +695,22 @@ class GlobalNode(Node):
             setattr(self, "value", CommaProxyList(self.value, on_attribute="value"))
 
 
+class NonlocalNode(Node):
+    def _string_to_node_list(self, string, parent, on_attribute):
+        if on_attribute == "value":
+            fst = baron.parse("nonlocal %s" % string)[0]["value"]
+            return NodeList.from_fst(fst, parent=parent, on_attribute=on_attribute)
+
+        else:
+            raise Exception("Unhandled case")
+
+    def __setattr__(self, key, value):
+        super(NonlocalNode, self).__setattr__(key, value)
+
+        if key == "value" and not isinstance(self.value, CommaProxyList):
+            setattr(self, "value", CommaProxyList(self.value, on_attribute="value"))
+
+
 class HexaNode(Node, LiteralyEvaluable):
     pass
 
